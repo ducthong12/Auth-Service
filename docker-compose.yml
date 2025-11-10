@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Dịch vụ API (NestJS của bạn)
+  api:
+    build: .  # Build từ Dockerfile trong thư mục hiện tại
+    container_name: my_nestjs_app
+    ports:
+      - "${NODE_GRPC}:50051" # Sử dụng cổng từ file .env
+    environment:
+      # ----- Đây là cách NestJS kết nối Postgres -----
+      DB_HOST: postgres     # Dùng TÊN DỊCH VỤ của postgres
+      DB_PORT: 5432         # Cổng NỘI BỘ của container postgres
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      # ---------------------------------------------
+      PORT: 50051            # Cổng NestJS chạy bên trong container
+    depends_on:
+      - postgres # Chỉ khởi động khi postgres đã sẵn sàng
+
+  # Dịch vụ Postgres (như file của bạn)
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432" # Ánh xạ cổng 5431 (từ file .env) ra máy thật
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:
