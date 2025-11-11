@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -15,8 +16,17 @@ async function bootstrap() {
       },
     },
   );
+
+  // Kích hoạt ValidationPipe toàn cục
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Tự động loại bỏ các thuộc tính không có trong DTO
+      forbidNonWhitelisted: true, // Báo lỗi nếu có thuộc tính không mong muốn
+      transform: true, // Tự động chuyển đổi kiểu dữ liệu (ví dụ: string -> number)
+    }),
+  );
+
   await app.listen();
-  console.log('Auth Microservice (gRPC) is running on port 50051');
 }
 
 bootstrap()
