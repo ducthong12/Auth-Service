@@ -8,7 +8,7 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
+  @MinLength(6, { message: 'Password greater than 6 characters' })
   password: string;
 }
 
