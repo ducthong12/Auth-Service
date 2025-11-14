@@ -22,7 +22,6 @@ export class AuthService {
     // Tạo JWT token
     const payload = { sub: user.id, email: user.email };
     const token = await this.jwtService.signAsync(payload, {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       secret: this.configService.get<string>('JWT_ACCESS_KEY') || '15m',
     });
     return { token };
@@ -31,16 +30,16 @@ export class AuthService {
   // Logic xác thực token
   async validateToken(token: string) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const payload = await this.jwtService.verifyAsync(token, {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      const payload = await this.jwtService.verifyAsync<{
+        sub: string;
+        email?: string;
+      }>(token, {
         secret: this.configService.get<string>('JWT_ACCESS_KEY'),
       });
 
       // Token hợp lệ
       return {
         isValid: true,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         userId: payload.sub,
         error: null,
       };
